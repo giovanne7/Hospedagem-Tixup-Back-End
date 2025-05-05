@@ -4,6 +4,15 @@ const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const { autoPromover } = require("../controllers/usuariosController");
 
+import cors from 'cors';
+
+const app = express();
+
+app.use(cors({
+  origin: 'https://tixupfrontend.vercel.app',
+  credentials: true,
+}));
+
 router.put(
   "/tornar-organizador",
   authMiddleware,
