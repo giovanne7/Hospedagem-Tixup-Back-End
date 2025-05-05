@@ -3,6 +3,14 @@ const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const verificaTipoUsuario = require("../middlewares/verificaTipoUsuario");
 const notificacoesController = require("../controllers/notificacoesController");
+import cors from 'cors';
+
+const app = express();
+
+app.use(cors({
+  origin: 'https://tixupfrontend.vercel.app',
+  credentials: true,
+}));
 
 router.post(
   "/token",
