@@ -1,0 +1,426 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "TixUp API",
+      "description": "API para gerenciamento de eventos e ingressos",
+      "version": "1.0.0"
+    },
+    "host": "localhost:5000",
+    "basePath": "/api",
+    "schemes": [
+      "http"
+    ],
+    "securityDefinitions": {
+      "bearerAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "description": "Token JWT no formato: Bearer <token>"
+      }
+    },
+    "paths": {
+      "/auth/cadastro": {
+        "post": {
+          "description": "",
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "example": "Mark"
+                  },
+                  "email": {
+                    "example": "Marktixup@tixup.com"
+                  },
+                  "senha": {
+                    "example": "markencrypted"
+                  },
+                  "tipo": {
+                    "example": "organizador"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Created"
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "description": "",
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "any"
+                  },
+                  "senha": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/auth/login-firebase": {
+        "post": {
+          "description": "",
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idToken": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/eventos": {
+        "get": {
+          "tags": [
+            "Eventos"
+          ],
+          "summary": "Lista todos os eventos públicos",
+          "description": "",
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Eventos"
+          ],
+          "summary": "Cria um novo evento",
+          "description": "",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Evento criado com sucesso",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Evento"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "403": {
+              "description": "Forbidden"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          },
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nome": "Show do Matuê",
+                  "descricao": "Evento exclusivo com participações especiais",
+                  "data": "2025-06-20",
+                  "local": "Ginásio Central",
+                  "preco": 99.9,
+                  "imagem": "https://linkdaimagem.com/capa.jpg",
+                  "publico": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "/meus-eventos": {
+        "get": {
+          "tags": [
+            "Eventos"
+          ],
+          "summary": "Lista os eventos do organizador logado",
+          "description": "",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "403": {
+              "description": "Forbidden"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          },
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ]
+        }
+      },
+      "/ingressos/comprar": {
+        "post": {
+          "tags": [
+            "Ingressos"
+          ],
+          "summary": "Compra um ingresso para um evento",
+          "description": "",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Ingresso comprado com sucesso",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "id": 45,
+                    "evento_id": "acb123-xyz456",
+                    "usuario_id": "user123",
+                    "status": "pendente"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "403": {
+              "description": "Forbidden"
+            },
+            "404": {
+              "description": "Not Found"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          },
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "eventoId": "acb123-xyz456"
+                }
+              }
+            }
+          }
+        }
+      },
+      "/meus-ingressos": {
+        "get": {
+          "tags": [
+            "Ingressos"
+          ],
+          "summary": "Lista ingressos comprados pelo cliente autenticado",
+          "description": "",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Lista de ingressos do cliente",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "id": 1,
+                      "status": "pendente",
+                      "evento_id": "evento123",
+                      "eventos": {
+                        "nome": "Show do Matuê",
+                        "data": "2025-06-20",
+                        "local": "Ginásio Central"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "403": {
+              "description": "Forbidden"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          },
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ]
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Usuario": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nome": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "tipo": {
+              "type": "string",
+              "enum": [
+                "usuario",
+                "organizador"
+              ]
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "Evento": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nome": {
+              "type": "string"
+            },
+            "descricao": {
+              "type": "string"
+            },
+            "data": {
+              "type": "string",
+              "format": "date"
+            },
+            "local": {
+              "type": "string"
+            },
+            "preco": {
+              "type": "number"
+            },
+            "imagem": {
+              "type": "string"
+            },
+            "publico": {
+              "type": "boolean"
+            },
+            "organizador_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      {
+        "bearerAuth": []
+      }
+    ]
+  }

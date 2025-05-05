@@ -1,0 +1,1355 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TixUp API",
+    "description": "API para gerenciamento de eventos e ingressos",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
+  "basePath": "",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/cadastro": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Cadastro de novo usuário",
+        "description": "Cria um novo usuário com os dados fornecidos",
+        "responses": {
+          "201": {
+            "description": "Usuário criado com sucesso"
+          },
+          "400": {
+            "description": "Erro de validação ou email já existente"
+          },
+          "500": {
+            "description": "Erro interno ao cadastrar"
+          }
+        },
+        "requestBody": {}
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Login com email e senha",
+        "description": "Realiza login de usuário já cadastrado",
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso"
+          },
+          "401": {
+            "description": "Credenciais inválidas"
+          },
+          "500": {
+            "description": "Erro interno ao fazer login"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "senha"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "maria@exemplo.com"
+                  },
+                  "senha": {
+                    "type": "string",
+                    "example": "Senha@123"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login-firebase": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Login com Firebase",
+        "description": "Faz login ou cria usuário com token do Firebase",
+        "responses": {
+          "200": {
+            "description": "Login Firebase com sucesso"
+          },
+          "400": {
+            "description": "Token Firebase ausente ou inválido"
+          },
+          "500": {
+            "description": "Erro interno ao logar via Firebase"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "idToken"
+                ],
+                "properties": {
+                  "idToken": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJSUzI1NiIsIn..."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/eventos/": {
+      "get": {
+        "tags": [
+          "Eventos"
+        ],
+        "summary": "Lista todos os eventos públicos",
+        "description": "",
+        "parameters": [
+          {
+            "name": "categoria",
+            "in": "query",
+            "description": "Filtrar por categoria",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "data",
+            "in": "query",
+            "description": "Filtrar por data (formato YYYY-MM-DD)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Eventos públicos listados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Evento"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Eventos"
+        ],
+        "summary": "Cria um novo evento",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Evento criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Evento"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "example": "Show do Matuê"
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "example": "Evento com atrações especiais"
+                  },
+                  "data": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2025-06-20"
+                  },
+                  "local": {
+                    "type": "string",
+                    "example": "Ginásio Central"
+                  },
+                  "preco": {
+                    "type": "number",
+                    "example": 99.9
+                  },
+                  "imagem": {
+                    "type": "string",
+                    "example": "https://imagem.com/img.jpg"
+                  },
+                  "publico": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "categoria": {
+                    "type": "string",
+                    "example": "show"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/eventos/{id}/colaboradores": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "usuario_id": {
+                    "example": "any"
+                  },
+                  "permissao": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/eventos/meus-eventos": {
+      "get": {
+        "tags": [
+          "Eventos"
+        ],
+        "summary": "Lista os eventos do organizador logado",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/eventos/{id}": {
+      "delete": {
+        "tags": [
+          "Eventos"
+        ],
+        "summary": "Deleta um evento por ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do evento"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Evento deletado com sucesso"
+          },
+          "403": {
+            "description": "Não autorizado a deletar este evento"
+          },
+          "404": {
+            "description": "Evento não encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/eventos/{id}/vendas": {
+      "get": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Lista todos os ingressos vendidos para um evento",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do evento"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de ingressos vendidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "uuid-do-ingresso"
+                      },
+                      "nome_comprador": {
+                        "type": "string",
+                        "example": "João Comprador"
+                      },
+                      "data_compra": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-18T10:00:00Z"
+                      },
+                      "status": {
+                        "type": "string",
+                        "example": "pendente"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "403": {
+            "description": "Apenas organizadores podem visualizar vendas"
+          },
+          "404": {
+            "description": "Evento não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/colaboradores/eventos/{id}/colaboradores": {
+      "post": {
+        "tags": [
+          "Colaboradores"
+        ],
+        "summary": "Adiciona um colaborador a um evento",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do evento"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "usuario_id": {
+                    "type": "string",
+                    "example": "uuid-do-usuario"
+                  },
+                  "permissao": {
+                    "type": "string",
+                    "example": "checkin"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Colaboradores"
+        ],
+        "summary": "Lista os colaboradores de um evento",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do evento"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/colaboradores/promover-organizador": {
+      "put": {
+        "tags": [
+          "Colaboradores"
+        ],
+        "summary": "Promove um usuário a organizador",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "usuario_id": {
+                    "type": "string",
+                    "example": "uuid-do-usuario"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ingressos/comprar": {
+      "post": {
+        "tags": [
+          "Ingressos"
+        ],
+        "summary": "Compra um ingresso para um evento",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Ingresso comprado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "id": 45,
+                  "evento_id": "acb123-xyz456",
+                  "usuario_id": "user123",
+                  "status": "pendente"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "eventoId": {
+                    "type": "string",
+                    "example": "abc123-evento-id"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ingressos/meus": {
+      "get": {
+        "tags": [
+          "Ingressos"
+        ],
+        "summary": "Lista ingressos comprados pelo usuario autenticado",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de ingressos do usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "id": 1,
+                    "status": "pendente",
+                    "evento_id": "evento123",
+                    "eventos": {
+                      "nome": "Show do Matuê",
+                      "data": "2025-06-20",
+                      "local": "Ginásio Central"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notificacoes/token": {
+      "post": {
+        "tags": [
+          "Notificações"
+        ],
+        "summary": "Registra um token de push notification para o usuário autenticado",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token já registrado"
+          },
+          "201": {
+            "description": "Token registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Token registrado com sucesso"
+                    },
+                    "dispositivo": {
+                      "type": "object",
+                      "properties": {
+                        "usuario_id": {
+                          "type": "string",
+                          "example": "uuid-do-usuario"
+                        },
+                        "token_push": {
+                          "type": "string",
+                          "example": "fcm-token-exemplo"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos obrigatórios ausentes"
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token_push"
+                ],
+                "properties": {
+                  "token_push": {
+                    "type": "string",
+                    "example": "fcm-token-exemplo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notificacoes/": {
+      "post": {
+        "tags": [
+          "Notificações"
+        ],
+        "summary": "Envia uma notificação push para usuários de um evento ou um usuário específico",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificação enviada com sucesso"
+          },
+          "400": {
+            "description": "Campos obrigatórios ausentes"
+          },
+          "404": {
+            "description": "Evento ou usuário não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "evento_id": {
+                    "type": "string",
+                    "example": "uuid-do-evento"
+                  },
+                  "usuario_id": {
+                    "type": "string",
+                    "example": "uuid-do-usuario"
+                  },
+                  "titulo": {
+                    "type": "string",
+                    "example": "Evento Atualizado"
+                  },
+                  "mensagem": {
+                    "type": "string",
+                    "example": "O evento foi atualizado, confira!"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Notificações"
+        ],
+        "summary": "Lista as notificações do usuário autenticado",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lida",
+            "in": "query",
+            "description": "Filtrar por notificações lidas (true) ou não lidas (false)",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "evento_id",
+            "in": "query",
+            "description": "Filtrar por notificações de um evento específico",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificações listadas com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "uuid-da-notificacao"
+                      },
+                      "tipo": {
+                        "type": "string",
+                        "example": "push"
+                      },
+                      "mensagem": {
+                        "type": "string",
+                        "example": "O evento foi atualizado!"
+                      },
+                      "titulo": {
+                        "type": "string",
+                        "example": "Evento Atualizado"
+                      },
+                      "data_criacao": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-18T10:00:00Z"
+                      },
+                      "lida": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "status": {
+                        "type": "string",
+                        "example": "enviada"
+                      },
+                      "evento_id": {
+                        "type": "string",
+                        "example": "uuid-do-evento"
+                      },
+                      "eventos": {
+                        "type": "object",
+                        "properties": {
+                          "nome": {
+                            "type": "string",
+                            "example": "Show do Matuê"
+                          },
+                          "data": {
+                            "type": "string",
+                            "example": "2025-06-20"
+                          },
+                          "local": {
+                            "type": "string",
+                            "example": "Ginásio Central"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/usuarios/tornar-organizador": {
+      "put": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Promove o usuário autenticado a organizador",
+        "description": "Essa rota permite que um usuário comum ative o modo organizador.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "object"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "uuid"
+                  }
+                }
+              },
+              "nome": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "email": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "email"
+                  }
+                }
+              },
+              "tipo": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "enum": {
+                    "type": "array",
+                    "example": [
+                      "usuario",
+                      "organizador"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "created_at": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "date-time"
+                  }
+                }
+              },
+              "updated_at": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Evento": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "object"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "uuid"
+                  }
+                }
+              },
+              "nome": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "descricao": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "date"
+                  }
+                }
+              },
+              "local": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "preco": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "number"
+                  }
+                }
+              },
+              "imagem": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "publico": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "boolean"
+                  }
+                }
+              },
+              "categoria": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "organizador_id": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "uuid"
+                  }
+                }
+              },
+              "created_at": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "date-time"
+                  }
+                }
+              },
+              "updated_at": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Notificacao": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "object"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "uuid"
+                  }
+                }
+              },
+              "usuario_id": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "uuid"
+                  }
+                }
+              },
+              "tipo": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "mensagem": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "titulo": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "data_criacao": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "date-time"
+                  }
+                }
+              },
+              "lida": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "boolean"
+                  }
+                }
+              },
+              "status": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  }
+                }
+              },
+              "evento_id": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "description": "Token JWT no formato: Bearer <token>"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}
