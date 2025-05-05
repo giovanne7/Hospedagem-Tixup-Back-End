@@ -6,14 +6,12 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./src/config/swagger-output.json");
 const logger = require("./src/middlewares/logger");
 global.resBODY = null;
+import cors from 'cors';
 
-const app = express();
-app.use(
-  cors({
-    origin: "https://tixupfrontend.vercel.app",
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: '*', // Permite qualquer origem (CORS aberto)
+  credentials: true, // Permite enviar cookies e cabeçalhos de autorização
+}));
 
 app.use(helmet());
 app.use(morgan("dev"));
