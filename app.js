@@ -7,11 +7,11 @@ const logger = require("./src/middlewares/logger");
 global.resBODY = null;
 import cors from 'cors';
 
+// Ativando CORS para qualquer origem momentaneamente para teste
 app.use(cors({
   origin: '*', // Permite qualquer origem (CORS aberto)
   credentials: true, // Permite enviar cookies e cabeçalhos de autorização
 }));
-
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json({ limit: "10mb" }));
