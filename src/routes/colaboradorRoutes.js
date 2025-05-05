@@ -3,14 +3,7 @@ const router = express.Router();
 const colaboradorController = require("../controllers/colaboradoresController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const verificaTipoUsuario = require("../middlewares/verificaTipoUsuario");
-import cors from 'cors';
 
-const app = express();
-
-app.use(cors({
-  origin: 'https://tixupfrontend.vercel.app',
-  credentials: true,
-}));
 
 router.use(authMiddleware);
 
