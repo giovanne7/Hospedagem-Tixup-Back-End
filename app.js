@@ -10,7 +10,7 @@ global.resBODY = null;
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "tixupfrontend.vercel.app",
     credentials: true,
   })
 );
