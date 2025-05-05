@@ -4,11 +4,11 @@
   "description": "O TixUp Backend é a API REST desenvolvida com Node.js e Express, responsável por gerenciar a autenticação, cadastro de usuários, criação e gerenciamento de eventos e ingressos. O projeto utiliza PostgreSQL (via Supabase ou Docker) como banco de dados e implementa autenticação segura com JWT e Firebase Authentication.",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node src/server.js",         // Script para iniciar o servidor
     "test": "jest",
-    "dev": "nodemon src/server.js",
+    "dev": "nodemon src/server.js",        // Para desenvolvimento local
     "swagger-autogen": "node src/config/swagger.js",
-    "build": "echo 'No build step required for backend, deploy directly'"
+    "build": "echo 'No build step required for backend, deploy directly'" // Para o Vercel
   },
   "jest": {
     "testEnvironment": "node"
