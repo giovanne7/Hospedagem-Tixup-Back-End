@@ -10,7 +10,7 @@ global.resBODY = null;
 const app = express();
 app.use(
   cors({
-    origin: "tixupfrontend.vercel.app",
+    origin: "https://tixupfrontend.vercel.app",
     credentials: true,
   })
 );
