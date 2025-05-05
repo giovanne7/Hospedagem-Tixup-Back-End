@@ -5,6 +5,14 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const verificaTipoUsuario = require("../middlewares/verificaTipoUsuario");
 const supabase = require("../config/supabaseClient");
 const { sendSuccess, sendError } = require("../utils/responseFormatter");
+import cors from 'cors';
+
+const app = express();
+
+app.use(cors({
+  origin: 'https://tixupfrontend.vercel.app',
+  credentials: true,
+}));
 
 // Rota pública para listar eventos
 router.get(
